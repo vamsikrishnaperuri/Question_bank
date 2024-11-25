@@ -10,6 +10,7 @@ Steps to Follow for Installing the System
 5. Run the Code : (./code.sh) 
 
 Note : 
+1. Use only http not https
 1. To obtain the excel sheet download it from the endpoint (/get-Data)
 2. If the server is turned off before the excel sheet is downloaded all the data will be lost. 
 
