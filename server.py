@@ -1,6 +1,7 @@
 # The Backend Server Logic
 
 import pandas as pd
+import sys
 import functions as func
 from variables import generatedQuestions, QuestionSelection, registeredQuestions
 from fastapi import FastAPI, Response, Request
@@ -18,8 +19,7 @@ app.mount('/questions', StaticFiles(directory="questions"), name='questions')
 
 origins = [
     "http://localhost",  # Local frontend application
-    "http://localhost:3000",  # If your frontend is running on port 3000
-    "https://yourfrontend.com",  # Your production frontend URL
+    "http://localhost:8000",  # If your frontend is running on port 3000
     "*",  # Allow all origins (not recommended for production)
 ]
 
@@ -34,7 +34,7 @@ app.add_middleware(
 
 @app.get('/')
 def loginPage():
-    return Response(content=func.renderFile("src/html/index.html", {'subject_name': 'DSA'}), media_type="text/html")
+    return Response(content=func.renderFile("src/html/index.html", {'subject_name': "AITT"}), media_type="text/html")
 
 @app.get("/generate-question")
 def generateQuestion(rollNumber: str):

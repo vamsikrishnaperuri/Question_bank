@@ -1,1 +1,1 @@
-python3 server.py DSA
+python3 server.py

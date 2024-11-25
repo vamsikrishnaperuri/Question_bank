@@ -1,2 +1,15 @@
-We will save the questions as images and pick questions at random 
-We will save the preferences of the students in a file
+Steps to Follow for Installing the System
+
+1. Clone the Repository (git clone https://github.com/harsha-0907/External-Examination.git)
+2. Install all the necessary packages (pip install -r requirments.txt)
+3. Move to the program directory
+    3.1. Load the questions into the respective directorie (questions/easy, questions/medium, questions/hard)
+    3.2. No need to worry about names. 
+4. Give Executable permission to the code.sh (chmod +x code.sh)
+5. Run the Code : (./code.sh) 
+
+Note : 
+1. To obtain the excel sheet download it from the endpoint (/get-Data)
+2. If the server is turned off before the excel sheet is downloaded all the data will be lost. 
+
+For any problem contact me. :(
