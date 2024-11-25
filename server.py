@@ -1,61 +1,76 @@
-# The Main Method to serve the pages
+# The Backend Server Logic
 
-try:
-    import os
-    from typing import List
-    import sys
-    import functions as func
-    import uvicorn
-    from fastapi.staticfiles import StaticFiles
-    from fastapi import FastAPI, Response, Form, Cookie, Request
-    from fastapi.templating import Jinja2Templates
-    from fastapi.responses import HTMLResponse
-    from random import random
-except Exception as e:
-    exit()
+import pandas as pd
+import functions as func
+from variables import generatedQuestions, QuestionSelection, registeredQuestions
+from fastapi import FastAPI, Response, Request
+from fastapi.responses import JSONResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
 
 app = FastAPI()
-templates = Jinja2Templates(directory="src/html")
+
+# Mount directories for static files
 app.mount("/img", StaticFiles(directory="src/img"), name="img")
 app.mount('/css', StaticFiles(directory="src/css"), name="css")
 app.mount('/questions', StaticFiles(directory="questions"), name='questions')
 
+origins = [
+    "http://localhost",  # Local frontend application
+    "http://localhost:3000",  # If your frontend is running on port 3000
+    "https://yourfrontend.com",  # Your production frontend URL
+    "*",  # Allow all origins (not recommended for production)
+]
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,  # List of allowed origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all HTTP methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allows all headers
+)
+
 @app.get('/')
 def loginPage():
-    content = func.readFile("src/html/loginPage.html")
-    content = f'{content}'
-    resp = Response(content,  media_type="text/html", status_code=200)
-    # print(resp, dir(resp))
+    return Response(content=func.renderFile("src/html/index.html", {'subject_name': 'DSA'}), media_type="text/html")
+
+@app.get("/generate-question")
+def generateQuestion(rollNumber: str):
+    if rollNumber not in generatedQuestions:
+        generatedQuestions[rollNumber] = func.generateQuestions()
+    content = func.renderFile("src/html/generate-question.html", {"easy_question": generatedQuestions[rollNumber][0], "medium_question": generatedQuestions[rollNumber][1], "hard_question": generatedQuestions[rollNumber][2]})
+    resp =  Response(content=content, media_type="text/html")
+    resp.set_cookie(key="rollNumber", value=rollNumber)
     return resp
 
-@app.post('/login')
-def loginUser(username: str = Form(...), request: Request = None, response: Response = None):
-    # Obtain the question (assumed to be defined elsewhere)
-    question = func.obtainQuestion()
-    # print(question, question.easy_question, question.med_question, question.hard_question)
-    return templates.TemplateResponse("questions.html", {
-        "request": request,
-        'question_hard': '/questions/'+question.hard_question,
-        'question_med': '/questions/'+question.med_question,
-        'question_easy': '/questions/'+question.easy_question
-    }, cookies={'username': username})
 
-@app.post("/register-question")
-def register_question(request: Request, question: list[str] = Form(...), username: str = Form(None)):
-    # Print the received data to the console
-    print("Received questions:", question)
-    print("Username:", username)
+@app.post("/register-questions")
+def registerQuestions(question: QuestionSelection, request: Request):
+    rollNumber = request.cookies.get('rollNumber')
+    if question.easy and question.medium:
+        level = 1
+    elif question.easy and question.hard:
+        level = 2
+    elif question.medium and question.hard:
+        level = 3
+    print(rollNumber, level)
 
-    # Return the success HTML page
-    return HTMLResponse(content=func.readFile("src/html/questions.html"))
-
+    registeredQuestions[rollNumber] = level
+    return JSONResponse(content={"message": "Selection submitted successfully!"}, status_code=200)
+    
+@app.get('/get-Data')
+def getExcelSheet():
+    data = dict()
+    data["Registered Numbers"] = registeredQuestions.keys()
+    data["Level"] = []
+    for roll in data["Registered Numbers"]:
+        data["Level"].append(registeredQuestions[roll])
+    df = pd.DataFrame(data)
+    file_path = 'students.xlsx'
+    df.to_excel("sheet.xlsx", index=False, engine='openpyxl')
+    return FileResponse("sheet.xlsx", media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', filename="students.xlsx")
 
 if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        registered_students = []
-        excel_data = {'Roll Number': [], 'Level': []}
-        subject_name = sys.argv[1]
-    else:
-        print("No Subject Given")
-        exit()
-    uvicorn.run("server:app", host="0.0.0.0", port=8000, log_level="info", reload=True)
+    uvicorn.run("server:app", host="0.0.0.0", port=8000, reload=True)

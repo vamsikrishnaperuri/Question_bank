@@ -1,35 +1,30 @@
-import os
+# The functions to support the Server
+
 import random
-from pydantic import BaseModel
-import pandas as pd
+import os
 
-class LoginPage(BaseModel):
-    username: str = ''
-
-class Question(BaseModel):
-    easy_question : str = ''
-    med_question : str = ''
-    hard_question : str = ''
-
-def readFiles(path: str =''):
+def readFile(path):
     if os.path.exists(path):
-        return list(os.listdir(path))
+        with open(path, 'r') as file:
+            return file.read()
+    return ""
+
+def readDirectory(directory_path):
+    if os.path.exists(directory_path):
+        return os.listdir(directory_path)
     else:
         return []
 
-def readFile(path: str = ''):
-    if os.path.exists:
-        with open(path, 'r') as file:
-            return file.read()
-    return ''
+def renderFile(path: str = '', params: dict = dict()):
+    content = readFile(path)
+    #print(params)
+    for param in params:
+        replace_string = params[param]
+        query_string = '{' + param + '}'
+        #print(query_string, replace_string)
+        content = content.replace(query_string, replace_string)
+    return content
 
-def obtainQuestion():
-    low, med, high = readFiles('questions/high'), readFiles('questions/medium'), readFiles('questions/low')
-    question = Question
-    question.easy_question, question.med_question, question.hard_question = 'high/'+random.choice(low), 'medium/'+random.choice(med), 'low/'+random.choice(high)
-    # print(question.easy_question, question.med_question, question.hard_question)
-    return question
-
-path = "src/html"
-res = readFiles(path)
-print(res)
+def generateQuestions():
+    easy, medium, hard = readDirectory('questions/easy'), readDirectory('questions/medium'), readDirectory('questions/hard')
+    return ['/questions/easy/' + random.choice(easy), '/questions/medium/' + random.choice(medium), '/questions/hard/' + random.choice(hard)]
