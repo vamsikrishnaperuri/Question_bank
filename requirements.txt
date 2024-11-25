@@ -5,5 +5,5 @@ autopep8
 # App
 fastapi
 uvicorn
-jinja2
 pandas
+pydantic
