@@ -1,8 +1,9 @@
 Steps to Follow for Installing the System
 
 1. Clone the Repository (git clone https://github.com/harsha-0907/External-Examination.git)
-2. Install all the necessary packages (pip install -r requirments.txt)
-3. Move to the program directory
+2. Move to the program directory(cd External-Examination)
+    3.0. Create a venv (python3 -m venv venv, then use the env (source venv/bin/activate))
+    3.1. Install all the necessary packages (pip install -r requirments.txt)
     3.1. Load the questions into the respective directorie (questions/easy, questions/medium, questions/hard)
     3.2. No need to worry about names. 
 4. Give Executable permission to the code.sh (chmod +x code.sh)

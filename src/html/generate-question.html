@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Questions</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+
+        .question-box {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .images-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .image-container {
+            text-align: center;
+        }
+
+        .images-container img {
+            width: 100px;
+            height: 100px;
+            cursor: pointer;
+            border-radius: 10px;
+            border: 2px solid #ccc;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .images-container img.selected {
+            border-color: #4CAF50;
+            transform: scale(1.1);
+        }
+
+        .label {
+            margin-top: 10px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="question-box">
+        <h2>Select 2 out of the 3 images</h2>
+        <div class="images-container">
+            <div class="image-container">
+                <img src="{easy_question}" alt="Easy" id="easy" data-question="easy">
+                <div class="label">Easy</div>
+            </div>
+            <div class="image-container">
+                <img src="{medium_question}" alt="Medium" id="medium" data-question="medium">
+                <div class="label">Medium</div>
+            </div>
+            <div class="image-container">
+                <img src="{hard_question}" alt="Hard" id="hard" data-question="hard">
+                <div class="label">Hard</div>
+            </div>
+        </div>
+        <button type="button" id="submitBtn">Submit</button>
+    </div>
+
+    <script>
+        let selectedImages = new Set();
+
+        const images = document.querySelectorAll('.images-container img');
+        images.forEach(image => {
+            image.addEventListener('click', function() {
+                if (selectedImages.size < 2 || selectedImages.has(image.id)) {
+                    image.classList.toggle('selected');
+                    if (image.classList.contains('selected')) {
+                        selectedImages.add(image.id);
+                    } else {
+                        selectedImages.delete(image.id);
+                    }
+                } else {
+                    alert('You can select only 2 questions.');
+                }
+            });
+        });
+
+        document.getElementById('submitBtn').addEventListener('click', function() {
+            if (selectedImages.size !== 2) {
+                alert('Please select 2 Questions only.');
+                return;
+            }
+
+            const selection = {
+                easy: false,
+                medium: false,
+                hard: false
+            };
+
+            selectedImages.forEach(imageId => {
+                selection[imageId] = true;
+            });
+
+            fetch('/register-questions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(selection)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Selection submitted successfully! Please Note Down Your Questions');
+                console.log('Server Response:', data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while submitting your selection.');
+            });
+        });
+    </script>
+</body>
+</html>

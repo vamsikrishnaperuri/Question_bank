@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>External Examination System</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="center-container">
+        <div class="login-box">
+            <img src="/img/mvgr-logo.jpg" alt="College Logo" class="logo">
+            <h1>Login - External Examination</h1>
+            <h2>Subject Name: {subject_name}</h2>
+            <form id="loginForm" action="/generate-question" method="GET">
+                <label for="rollNumber">Enter your Roll Number:</label>
+                <input type="text" id="rollNumber" name="rollNumber" required>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
