@@ -50,11 +50,11 @@ def generateQuestion(rollNumber: str):
 def registerQuestions(question: QuestionSelection, request: Request):
     rollNumber = request.cookies.get('rollNumber')
     if question.easy and question.medium:
-        level = 1
+        level = 3
     elif question.easy and question.hard:
         level = 2
     elif question.medium and question.hard:
-        level = 3
+        level = 1
     print(rollNumber, level)
 
     registeredQuestions[rollNumber] = level
